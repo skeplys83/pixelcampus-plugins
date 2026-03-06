@@ -1,6 +1,0 @@
-name: PixelCampusSMP
-version: ${project.version}
-main: de.pixelcampus.smp.SMPPlugin
-api-version: '1.21'
-description: Plugin for the PixelCampus Survival (SMP) server.
-authors: [ PixelCampus ]

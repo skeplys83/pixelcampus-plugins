@@ -1,6 +1,0 @@
-name: PixelCampusJumpAndRun
-version: ${project.version}
-main: de.pixelcampus.jumpandrun.JumpAndRunPlugin
-api-version: '1.21'
-description: Plugin for the PixelCampus Jump & Run server.
-authors: [ PixelCampus ]
