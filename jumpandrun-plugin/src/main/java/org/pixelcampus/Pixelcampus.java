@@ -7,7 +7,7 @@ public final class Pixelcampus extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getCommand("testCommand").setExecutor(new HelloWorld(this));
+        getCommand("testCommand").setExecutor(new HelloWorld());
         getServer().getPluginManager().registerEvents(new Events.HelloWorld(), this);
 
     }
