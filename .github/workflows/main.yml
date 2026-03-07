@@ -36,73 +36,34 @@ jobs:
       - name: Build plugin
         run: ./gradlew build
 
-      - name: Find built jar and export names
+      - name: Find built jar
         run: |
           JAR_PATH=$(find build/libs -maxdepth 1 -type f -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -n 1)
 
           if [ -z "$JAR_PATH" ]; then
-            echo "No plugin jar found in jumpandrun-plugin/build/libs"
+            echo "No plugin jar found."
             exit 1
           fi
 
-          JAR_FILE_NAME=$(basename "$JAR_PATH")
-
           echo "JAR_PATH=$JAR_PATH" >> "$GITHUB_ENV"
-          echo "JAR_FILE_NAME=$JAR_FILE_NAME" >> "$GITHUB_ENV"
 
       - name: Install lftp
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
 
-      - name: Deploy jar to JumpAndRun server
+      - name: Upload plugin to JumpAndRun server
         run: |
-          REMOTE_PLUGIN_DIR="/plugins"
-          REMOTE_MARKER_FILE="/plugins/.jumpandrun-current-jar"
-          LOCAL_MARKER_FILE="$(mktemp)"
-          OLD_REMOTE_JAR=""
-
-          # Try to download the marker file. If it doesn't exist yet, that's fine.
           lftp -u "${{ secrets.JNR_SFTP_USER }},${{ secrets.JNR_SFTP_PASSWORD }}" \
-            "sftp://${{ secrets.JNR_SFTP_HOST }}:${{ secrets.JNR_SFTP_PORT }}" <<EOF
+          sftp://${{ vars.JNR_SFTP_HOST }}:${{ vars.JNR_SFTP_PORT }} <<EOF
           set sftp:auto-confirm yes
-          get "$REMOTE_MARKER_FILE" -o "$LOCAL_MARKER_FILE"
+          put "$JAR_PATH" -o "/plugins/${{ vars.JNR_PLUGIN_FILE_NAME }}"
           bye
           EOF
-          true
-
-          if [ -f "$LOCAL_MARKER_FILE" ]; then
-            OLD_REMOTE_JAR=$(tr -d '\r\n' < "$LOCAL_MARKER_FILE")
-          fi
-
-          echo "Old deployed jar: ${OLD_REMOTE_JAR:-<none>}"
-          echo "New built jar: $JAR_FILE_NAME"
-
-          if [ "$OLD_REMOTE_JAR" = "$JAR_FILE_NAME" ]; then
-            echo "Same filename -> overwrite existing jar"
-            lftp -u "${{ secrets.JNR_SFTP_USER }},${{ secrets.JNR_SFTP_PASSWORD }}" \
-              "sftp://${{ secrets.JNR_SFTP_HOST }}:${{ secrets.JNR_SFTP_PORT }}" <<EOF
-            set sftp:auto-confirm yes
-            put "$JAR_PATH" -o "$REMOTE_PLUGIN_DIR/$JAR_FILE_NAME"
-            bye
-            EOF
-          else
-            echo "Different filename -> delete old jar (if present), upload new jar, update marker"
-            printf '%s' "$JAR_FILE_NAME" > "$LOCAL_MARKER_FILE"
-
-            lftp -u "${{ secrets.JNR_SFTP_USER }},${{ secrets.JNR_SFTP_PASSWORD }}" \
-              "sftp://${{ secrets.JNR_SFTP_HOST }}:${{ secrets.JNR_SFTP_PORT }}" <<EOF
-            set sftp:auto-confirm yes
-            $( [ -n "$OLD_REMOTE_JAR" ] && printf 'rm "%s/%s"\n' "$REMOTE_PLUGIN_DIR" "$OLD_REMOTE_JAR" )
-            put "$JAR_PATH" -o "$REMOTE_PLUGIN_DIR/$JAR_FILE_NAME"
-            put "$LOCAL_MARKER_FILE" -o "$REMOTE_MARKER_FILE"
-            bye
-            EOF
-          fi
 
       - name: Restart JumpAndRun server
         run: |
-          curl -X POST "${{ secrets.JNR_PANEL_URL }}/api/client/servers/${{ secrets.JNR_SERVER_ID }}/power" \
+          curl -X POST "${{ vars.JNR_PANEL_URL }}/api/client/servers/${{ vars.JNR_SERVER_ID }}/power" \
             -H "Authorization: Bearer ${{ secrets.JNR_CLIENT_API_KEY }}" \
             -H "Accept: Application/vnd.pterodactyl.v1+json" \
             -H "Content-Type: application/json" \
