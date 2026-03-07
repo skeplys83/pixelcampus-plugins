@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'jumpandrun-plugin/**'
+  workflow_dispatch:
 
 concurrency:
   group: deploy-jumpandrun-main
