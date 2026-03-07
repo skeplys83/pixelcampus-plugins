@@ -64,6 +64,23 @@ echo "Built: $JAR_PATH"
 
 # ─── Upload ───────────────────────────────────────────────────────────────────
 
+echo "Testing SFTP connection..."
+
+lftp -d -u "$JNR_SFTP_USER,$JNR_SFTP_PASSWORD" "sftp://$JNR_SFTP_HOST:$JNR_SFTP_PORT" <<EOF
+set cmd:fail-exit yes
+set net:timeout 10
+set net:max-retries 1
+set net:reconnect-interval-base 5
+set net:reconnect-interval-max 5
+set sftp:auto-confirm yes
+pwd
+ls
+put "$JAR_PATH" -o "/plugins/$JNR_PLUGIN_FILE_NAME"
+bye
+EOF
+
+# ─── Upload ───────────────────────────────────────────────────────────────────
+
 echo "Uploading plugin via SFTP..."
 
 lftp -u "$JNR_SFTP_USER,$JNR_SFTP_PASSWORD" "sftp://$JNR_SFTP_HOST:$JNR_SFTP_PORT" <<EOF
