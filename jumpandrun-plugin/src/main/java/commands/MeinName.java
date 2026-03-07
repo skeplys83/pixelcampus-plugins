@@ -9,7 +9,7 @@ public class MeinName implements CommandExecutor{
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String @NotNull [] strings) {
-        commandSender.sendMessage(commandSender.getName());
+        commandSender.sendMessage(commandSender.getName() + " ist ein Hurensohn");
         return false;
     }
 }
