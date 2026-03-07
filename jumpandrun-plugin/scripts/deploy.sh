@@ -48,51 +48,7 @@ if ! ssh-keyscan -p "$JNR_SFTP_PORT" "$JNR_SFTP_HOST" >> ~/.ssh/known_hosts 2>/d
 fi
 
 # Upload plugin
-max_scp_attempts=5
-scp_attempt=1
-
-echo "Starting SCP upload with retries (max attempts: $max_scp_attempts)"
-echo "Debug: target=${JNR_SFTP_HOST}:${JNR_SFTP_PORT}, remote_user=${JNR_SFTP_USER}, local_jar=${JAR_PATH}, remote_file=${JNR_PLUGIN_FILE_NAME}"
-
-while (( scp_attempt <= max_scp_attempts )); do
-  echo "----- SCP attempt ${scp_attempt}/${max_scp_attempts} -----"
-  date -u '+Debug UTC time: %Y-%m-%dT%H:%M:%SZ'
-
-  # Quick connectivity check before each attempt for clearer error context.
-  if ! nc -zvw5 "$JNR_SFTP_HOST" "$JNR_SFTP_PORT"; then
-    echo "Debug: TCP pre-check failed for ${JNR_SFTP_HOST}:${JNR_SFTP_PORT}" >&2
-  fi
-
-  set +e
-  scp -vvv \
-      -o StrictHostKeyChecking=accept-new \
-      -o ConnectTimeout=20 \
-      -o ConnectionAttempts=1 \
-      -o ServerAliveInterval=10 \
-      -o ServerAliveCountMax=2 \
-      -i ~/.ssh/id_ed25519 \
-      -P "$JNR_SFTP_PORT" \
-      "$JAR_PATH" \
-      "$JNR_SFTP_USER@$JNR_SFTP_HOST:/plugins/$JNR_PLUGIN_FILE_NAME"
-  scp_exit_code=$?
-  set -e
-
-  if [[ "$scp_exit_code" -eq 0 ]]; then
-    echo "SCP upload succeeded on attempt ${scp_attempt}/${max_scp_attempts}."
-    break
-  fi
-
-  echo "SCP upload failed on attempt ${scp_attempt}/${max_scp_attempts} with exit code ${scp_exit_code}." >&2
-
-  if (( scp_attempt == max_scp_attempts )); then
-    echo "SCP upload failed after ${max_scp_attempts} attempts. Aborting deployment." >&2
-    exit "$scp_exit_code"
-  fi
-
-  echo "Retrying in 5 seconds..." >&2
-  sleep 5
-  ((scp_attempt++))
-done
+scp -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 -P "$JNR_SFTP_PORT" "$JAR_PATH" "$JNR_SFTP_USER@$JNR_SFTP_HOST:/plugins/$JNR_PLUGIN_FILE_NAME"
 
 echo "Uploaded plugin"
 
