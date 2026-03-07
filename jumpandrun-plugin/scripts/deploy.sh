@@ -48,7 +48,7 @@ echo "test1"
 if ! ssh-keyscan -p "$JNR_SFTP_PORT" "$JNR_SFTP_HOST" >> ~/.ssh/known_hosts 2>/dev/null; then
   echo "Warning: ssh-keyscan failed for $JNR_SFTP_HOST:$JNR_SFTP_PORT; continuing with strict host key accept-new" >&2
 fi
-
+ssh-keyscan -p "$JNR_SFTP_PORT" "$JNR_SFTP_HOST"
 echo "test2"
 
 # Upload plugin
