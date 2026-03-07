@@ -1,6 +1,6 @@
-name: Pixelcampus
+name: Jumpnrun
 version: '1.0'
-main: org.pixelcampus.Pixelcampus
+main: org.pixelcampus.jumpnrun.Jumpnrun
 api-version: '1.21'
 commands:
   testCommand:
