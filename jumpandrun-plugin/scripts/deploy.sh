@@ -47,6 +47,7 @@ sftp -v \
   -o StrictHostKeyChecking=accept-new \
   -o ConnectTimeout=20 \
   -o ConnectionAttempts=3 \
+  -o KexAlgorithms=curve25519-sha256@libssh.org,diffie-hellman-group14-sha256 \
   -i ~/.ssh/id_ed25519 \
   -P "$JNR_SFTP_PORT" \
   "$JNR_SFTP_USER@$JNR_SFTP_HOST" <<EOF
