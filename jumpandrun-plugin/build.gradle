@@ -54,10 +54,10 @@ processResources {
     }
 }
 
-def localServerPluginsDir = file("D:/Minecraft_Plugin/plugins")
-
-tasks.register('deployToLocalServer', Copy) {
-    dependsOn(tasks.named('jar'))
-    from(tasks.named('jar').flatMap { it.archiveFile })
-    into(localServerPluginsDir)
-}
+//def localServerPluginsDir = file("D:/Minecraft_Plugin/plugins")
+//
+//tasks.register('deployToLocalServer', Copy) {
+//    dependsOn(tasks.named('jar'))
+//    from(tasks.named('jar').flatMap { it.archiveFile })
+//    into(localServerPluginsDir)
+//}
