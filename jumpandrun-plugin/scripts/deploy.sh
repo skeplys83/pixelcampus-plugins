@@ -15,7 +15,7 @@ required_vars=(
   JNR_SERVER_ID
   JNR_PANEL_URL
   JNR_SFTP_USER
-  JNR_SFTP_PASSWORD
+  JNR_SFTP_SSH_KEY
   JNR_CLIENT_API_KEY
   JNR_PLUGIN_FILE_NAME
 )
@@ -37,20 +37,22 @@ fi
 
 echo "Built: $JAR_PATH"
 
-# Upload plugin via FTP protocol
-FTP_TARGET="ftp://${JNR_SFTP_HOST}:${JNR_SFTP_PORT}/plugins/${JNR_PLUGIN_FILE_NAME}"
-echo "Uploading via FTP: ${FTP_TARGET}"
+# Prepare SSH key for SFTP
+mkdir -p ~/.ssh
+printf '%s\n' "$JNR_SFTP_SSH_KEY" > ~/.ssh/id_ed25519
+chmod 600 ~/.ssh/id_ed25519
 
-curl --verbose --show-error --fail \
-  --connect-timeout 20 \
-  --max-time 180 \
-  --retry 5 \
-  --retry-delay 5 \
-  --retry-all-errors \
-  --ftp-create-dirs \
-  --user "${JNR_SFTP_USER}:${JNR_SFTP_PASSWORD}" \
-  --upload-file "$JAR_PATH" \
-  "$FTP_TARGET"
+echo "Uploading via SFTP to ${JNR_SFTP_HOST}:${JNR_SFTP_PORT}"
+sftp -v \
+  -o StrictHostKeyChecking=accept-new \
+  -o ConnectTimeout=20 \
+  -o ConnectionAttempts=3 \
+  -i ~/.ssh/id_ed25519 \
+  -P "$JNR_SFTP_PORT" \
+  "$JNR_SFTP_USER@$JNR_SFTP_HOST" <<EOF
+put "$JAR_PATH" "/plugins/$JNR_PLUGIN_FILE_NAME"
+bye
+EOF
 
 echo "Uploaded plugin"
 

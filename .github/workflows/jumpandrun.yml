@@ -49,7 +49,7 @@ jobs:
       - name: Run deploy script
         working-directory: jumpandrun-plugin
         env:
-          JNR_SFTP_PASSWORD: ${{ secrets.JNR_SFTP_PASSWORD }}
+          JNR_SFTP_SSH_KEY: ${{ secrets.JNR_SFTP_SSH_KEY }}
           JNR_CLIENT_API_KEY: ${{ secrets.JNR_CLIENT_API_KEY }}
           JNR_SFTP_USER: ${{ secrets.JNR_SFTP_USER }}
           JNR_SFTP_HOST: ${{ vars.JNR_SFTP_HOST }}
