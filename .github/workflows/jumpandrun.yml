@@ -1,0 +1,47 @@
+name: Build and deploy JumpAndRun plugin
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'jumpandrun-plugin/**'
+
+concurrency:
+  group: deploy-jumpandrun-main
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install lftp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Make deploy script executable
+        run: chmod +x jumpandrun-plugin/scripts/deploy.sh
+
+      - name: Run deploy script
+        working-directory: jumpandrun-plugin
+        env:
+          JNR_SFTP_HOST: ${{ vars.JNR_SFTP_HOST }}
+          JNR_SFTP_PORT: ${{ vars.JNR_SFTP_PORT }}
+          JNR_PANEL_URL: ${{ vars.JNR_PANEL_URL }}
+          JNR_SERVER_ID: ${{ vars.JNR_SERVER_ID }}
+          JNR_PLUGIN_FILE_NAME: ${{ vars.JNR_PLUGIN_FILE_NAME }}
+          JNR_SFTP_USER: ${{ secrets.JNR_SFTP_USER }}
+          JNR_SFTP_PASSWORD: ${{ secrets.JNR_SFTP_PASSWORD }}
+          JNR_CLIENT_API_KEY: ${{ secrets.JNR_CLIENT_API_KEY }}
+        run: ./scripts/deploy.sh
