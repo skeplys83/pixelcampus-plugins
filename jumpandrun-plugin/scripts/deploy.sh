@@ -1,29 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-require_env() {
-  local name="$1"
-  if [[ -z "${!name:-}" ]]; then
-    echo "Missing required environment variable: $name" >&2
-    exit 1
-  fi
-}
-
-REQUIRED_VARS=(
-  JNR_SFTP_HOST
-  JNR_SFTP_PORT
-  JNR_SFTP_USER
-  JNR_SFTP_SSH_KEY
-  JNR_PLUGIN_FILE_NAME
-  JNR_PANEL_URL
-  JNR_SERVER_ID
-  JNR_CLIENT_API_KEY
-)
-
-for var_name in "${REQUIRED_VARS[@]}"; do
-  require_env "$var_name"
-done
-
 # Build plugin
 chmod +x ./gradlew
 ./gradlew build
