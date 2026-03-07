@@ -54,7 +54,7 @@ processResources {
     }
 }
 
-def localServerPluginsDir = file("/Users/user/Documents/paper-1.21.11/plugins")
+def localServerPluginsDir = file("D:/Minecraft_Plugin/plugins")
 
 tasks.register('deployToLocalServer', Copy) {
     dependsOn(tasks.named('jar'))
