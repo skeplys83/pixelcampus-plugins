@@ -15,7 +15,7 @@ required_vars=(
   JNR_SERVER_ID
   JNR_PANEL_URL
   JNR_SFTP_USER
-  JNR_SFTP_SSH_KEY
+  JNR_SFTP_PASSWORD
   JNR_CLIENT_API_KEY
   JNR_PLUGIN_FILE_NAME
 )
@@ -37,30 +37,20 @@ fi
 
 echo "Built: $JAR_PATH"
 
-# Prepare SSH key
-mkdir -p ~/.ssh
-printf '%s\n' "$JNR_SFTP_SSH_KEY" > ~/.ssh/id_ed25519
-chmod 600 ~/.ssh/id_ed25519
+# Upload plugin via FTP protocol
+FTP_TARGET="ftp://${JNR_SFTP_HOST}:${JNR_SFTP_PORT}/plugins/${JNR_PLUGIN_FILE_NAME}"
+echo "Uploading via FTP: ${FTP_TARGET}"
 
-echo "test1"
-
-# Add server host key
-if ! ssh-keyscan -p "$JNR_SFTP_PORT" "$JNR_SFTP_HOST" >> ~/.ssh/known_hosts 2>/dev/null; then
-  echo "Warning: ssh-keyscan failed for $JNR_SFTP_HOST:$JNR_SFTP_PORT; continuing with strict host key accept-new" >&2
-fi
-
-
-
-ssh -v \
-  -o BatchMode=yes \
-  -o StrictHostKeyChecking=yes \
-  -i ~/.ssh/id_ed25519 \
-  -p "$JNR_SFTP_PORT" \
-  "$JNR_SFTP_USER@$JNR_SFTP_HOST" exit
-echo "test2"
-
-# Upload plugin
-scp -o StrictHostKeyChecking=accept-new -i ~/.ssh/id_ed25519 -P "$JNR_SFTP_PORT" "$JAR_PATH" "$JNR_SFTP_USER@$JNR_SFTP_HOST:/plugins/$JNR_PLUGIN_FILE_NAME"
+curl --verbose --show-error --fail \
+  --connect-timeout 20 \
+  --max-time 180 \
+  --retry 5 \
+  --retry-delay 5 \
+  --retry-all-errors \
+  --ftp-create-dirs \
+  --user "${JNR_SFTP_USER}:${JNR_SFTP_PASSWORD}" \
+  --upload-file "$JAR_PATH" \
+  "$FTP_TARGET"
 
 echo "Uploaded plugin"
 
