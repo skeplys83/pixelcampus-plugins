@@ -1,4 +1,4 @@
-# pixelcampus-plugins
+# pixelcampus-plugins 
 
 Custom Minecraft plugins for the **PixelCampus** server network. Each plugin lives in its own sub-folder so that it can be developed, built, and released independently.
 
