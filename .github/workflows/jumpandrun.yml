@@ -29,6 +29,23 @@ jobs:
       - name: Make deploy script executable
         run: chmod +x jumpandrun-plugin/scripts/deploy.sh
 
+      - name: Check SFTP connectivity from runner
+        env:
+          JNR_SFTP_HOST: ${{ vars.JNR_SFTP_HOST }}
+          JNR_SFTP_PORT: ${{ vars.JNR_SFTP_PORT }}
+        run: |
+          if [[ -z "${JNR_SFTP_HOST:-}" || -z "${JNR_SFTP_PORT:-}" ]]; then
+            echo "::error::JNR_SFTP_HOST or JNR_SFTP_PORT is not configured in repository variables."
+            exit 1
+          fi
+          echo "Runner public IP: $(curl -s https://api.ipify.org)"
+          echo "Checking reachability: ${JNR_SFTP_HOST}:${JNR_SFTP_PORT}"
+          if ! nc -zvw10 "$JNR_SFTP_HOST" "$JNR_SFTP_PORT"; then
+            echo "::error::Cannot reach ${JNR_SFTP_HOST}:${JNR_SFTP_PORT} from this GitHub runner."
+            echo "::error::Allowlist the runner IP above in your firewall/provider or use a self-hosted runner."
+            exit 1
+          fi
+
       - name: Run deploy script
         working-directory: jumpandrun-plugin
         env:
