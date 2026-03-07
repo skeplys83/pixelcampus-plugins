@@ -46,6 +46,9 @@ jobs:
             exit 1
           fi
 
+      - name: Set global MTU to fix upload hang
+        run: sudo ip link set dev eth0 mtu 1000
+
       - name: Run deploy script
         working-directory: jumpandrun-plugin
         env:
