@@ -55,4 +55,4 @@ usercache.json
 # ======================
 # Plugin build artifacts
 # ======================
-*.jar
+#*.jar
