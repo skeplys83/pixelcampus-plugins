@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'jumpandrun-plugin/**'
-  workflow_dispatch:
 
 concurrency:
   group: deploy-jumpandrun-main
@@ -15,15 +14,6 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-      JNR_SFTP_HOST: ${{ secrets.JNR_SFTP_HOST }}
-      JNR_SFTP_PORT: ${{ secrets.JNR_SFTP_PORT }}
-      JNR_SERVER_ID: ${{ secrets.JNR_SERVER_ID }}
-      JNR_PANEL_URL: ${{ secrets.JNR_PANEL_URL }}
-      JNR_SFTP_USER: ${{ secrets.JNR_SFTP_USER }}
-      JNR_SFTP_SSH_KEY: ${{ secrets.JNR_SFTP_SSH_KEY }}
-      JNR_CLIENT_API_KEY: ${{ secrets.JNR_CLIENT_API_KEY }}
-      JNR_PLUGIN_FILE_NAME: ${{ secrets.JNR_PLUGIN_FILE_NAME }}
 
     steps:
       - name: Checkout repository
@@ -38,29 +28,17 @@ jobs:
       - name: Make deploy script executable
         run: chmod +x jumpandrun-plugin/scripts/deploy.sh
 
-      - name: Validate deploy environment
-        run: |
-          missing=0
-          required=(
-            JNR_SFTP_HOST
-            JNR_SFTP_PORT
-            JNR_SERVER_ID
-            JNR_PANEL_URL
-            JNR_SFTP_USER
-            JNR_SFTP_SSH_KEY
-            JNR_CLIENT_API_KEY
-            JNR_PLUGIN_FILE_NAME
-          )
-          for var in "${required[@]}"; do
-            if [[ -z "${!var:-}" ]]; then
-              echo "::error::Missing required variable: $var"
-              missing=1
-            else
-              echo "$var is configured"
-            fi
-          done
-          exit "$missing"
-
       - name: Run deploy script
         working-directory: jumpandrun-plugin
+        env:
+          JNR_SFTP_SSH_KEY: ${{ secrets.JNR_SFTP_SSH_KEY }}
+          JNR_CLIENT_API_KEY: ${{ secrets.JNR_CLIENT_API_KEY }}
+          JNR_SFTP_USER: ${{ secrets.JNR_SFTP_USER }}
+          JNR_SFTP_HOST: ${{ variables.JNR_SFTP_HOST }}
+          JNR_SFTP_PORT: ${{ variables.JNR_SFTP_PORT }}
+          JNR_SERVER_ID: ${{ variables.JNR_SERVER_ID }}
+          JNR_PANEL_URL: ${{ variables.JNR_PANEL_URL }}
+
+          JNR_PLUGIN_FILE_NAME: ${{ secrets.JNR_PLUGIN_FILE_NAME }}
+
         run: ./scripts/deploy.sh
