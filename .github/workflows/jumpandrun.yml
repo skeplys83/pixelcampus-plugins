@@ -35,7 +35,7 @@ jobs:
           JNR_SFTP_PORT: ${{ secrets.JNR_SFTP_PORT }}
           JNR_SERVER_ID: ${{ secrets.JNR_SERVER_ID }}
           JNR_PANEL_URL: ${{ secrets.JNR_PANEL_URL }}
-          JNR_FTP_USER: ${{ secrets.JNR_SFTP_USER }}
+          JNR_SFTP_USER: ${{ secrets.JNR_SFTP_USER }}
           JNR_SFTP_SSH_KEY: ${{ secrets.JNR_SFTP_SSH_KEY }}
           JNR_CLIENT_API_KEY: ${{ secrets.JNR_CLIENT_API_KEY }}
           JNR_PLUGIN_FILE_NAME: ${{ secrets.JNR_PLUGIN_FILE_NAME }}
