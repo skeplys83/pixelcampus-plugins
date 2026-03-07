@@ -39,7 +39,6 @@ jobs:
           JNR_SFTP_PORT: ${{ vars.JNR_SFTP_PORT }}
           JNR_SERVER_ID: ${{ vars.JNR_SERVER_ID }}
           JNR_PANEL_URL: ${{ vars.JNR_PANEL_URL }}
-
-          JNR_PLUGIN_FILE_NAME: ${{ secrets.JNR_PLUGIN_FILE_NAME }}
+          JNR_PLUGIN_FILE_NAME: ${{ vars.JNR_PLUGIN_FILE_NAME }}
 
         run: ./scripts/deploy.sh
