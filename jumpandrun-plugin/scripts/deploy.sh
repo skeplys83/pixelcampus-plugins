@@ -3,16 +3,28 @@ set -euo pipefail
 
 # ─── Configuration ────────────────────────────────────────────────────────────
 
-JNR_SFTP_HOST="${JNR_SFTP_HOST:-}"
-JNR_SFTP_PORT="${JNR_SFTP_PORT:-2022}"
-JNR_SFTP_USER="${JNR_SFTP_USER:-}"
-JNR_SFTP_PASSWORD="${JNR_SFTP_PASSWORD:-}"
+#JNR_SFTP_HOST="${JNR_SFTP_HOST:-}"
+#JNR_SFTP_PORT="${JNR_SFTP_PORT:-2022}"
+#JNR_SFTP_USER="${JNR_SFTP_USER:-}"
+#JNR_SFTP_PASSWORD="${JNR_SFTP_PASSWORD:-}"
+#
+#JNR_PANEL_URL="${JNR_PANEL_URL:-}"
+#JNR_SERVER_ID="${JNR_SERVER_ID:-}"
+#JNR_CLIENT_API_KEY="${JNR_CLIENT_API_KEY:-}"
+#
+#JNR_PLUGIN_FILE_NAME="${JNR_PLUGIN_FILE_NAME:-JumpAndRun.jar}"
 
-JNR_PANEL_URL="${JNR_PANEL_URL:-}"
-JNR_SERVER_ID="${JNR_SERVER_ID:-}"
-JNR_CLIENT_API_KEY="${JNR_CLIENT_API_KEY:-}"
+JNR_SFTP_HOST="node-01.pterodactyl.reutlingen.university"
+JNR_SFTP_PORT="25022"
+JNR_SFTP_USER="martin.hustoles.138c081c"
+JNR_SFTP_PASSWORD="Hentai1984!$"
 
-JNR_PLUGIN_FILE_NAME="${JNR_PLUGIN_FILE_NAME:-JumpAndRun.jar}"
+JNR_PANEL_URL="https://panel.pterodactyl.reutlingen.university"
+JNR_SERVER_ID="138c081c"
+JNR_CLIENT_API_KEY="ptlc_b5rEW6WOWlHka0k8EclAUMgP2Ho3mn9YuAXg3H2Noj2"
+
+JNR_PLUGIN_FILE_NAME="JumpAndRun.jar"
+
 
 # ─── Validation ───────────────────────────────────────────────────────────────
 
