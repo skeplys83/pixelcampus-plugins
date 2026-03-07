@@ -25,11 +25,6 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Install lftp
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y lftp
-
       - name: Make deploy script executable
         run: chmod +x jumpandrun-plugin/scripts/deploy.sh
 
@@ -38,11 +33,11 @@ jobs:
         env:
           JNR_SFTP_HOST: ${{ secrets.JNR_SFTP_HOST }}
           JNR_SFTP_PORT: ${{ secrets.JNR_SFTP_PORT }}
-          $JNR_SERVER_ID: ${{ secrets.JNR_SERVER_ID }}
-          $JNR_PANEL_URL: ${{ secrets.JNR_PANEL_URL }}
-          JNR_SFTP_USER: ${{ secrets.JNR_SFTP_USER }}
+          JNR_SERVER_ID: ${{ secrets.JNR_SERVER_ID }}
+          JNR_PANEL_URL: ${{ secrets.JNR_PANEL_URL }}
+          JNR_FTP_USER: ${{ secrets.JNR_SFTP_USER }}
           JNR_SFTP_SSH_KEY: ${{ secrets.JNR_SFTP_SSH_KEY }}
-          $JNR_CLIENT_API_KEY: ${{ secrets.JNR_CLIENT_API_KEY }}
+          JNR_CLIENT_API_KEY: ${{ secrets.JNR_CLIENT_API_KEY }}
           JNR_PLUGIN_FILE_NAME: ${{ secrets.JNR_PLUGIN_FILE_NAME }}
 
         run: ./scripts/deploy.sh
