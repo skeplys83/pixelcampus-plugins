@@ -1,6 +1,7 @@
 package Events;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,12 +24,13 @@ public class Schild implements Listener {
 
     @EventHandler
     public void onSignWrite(SignChangeEvent event){
-        List<Component> lines = event.lines();
+        TextComponent line = (TextComponent)event.line(0);
+        String firstLine = line.content().lines().findFirst().get();
 
-        event.getPlayer().sendMessage(lines.get(0).toString() + "test");
+        event.getPlayer().sendMessage(firstLine + " first line");
 
-        if(lines.get(0).toString() == "[1. Platz]"){
-            event.getPlayer().sendMessage(lines.get(0));
+        if(line.content().equals("[1. Platz]")){
+            event.getPlayer().sendMessage(line.toString());
         }
         else{
             event.getPlayer().sendMessage("falsch");
