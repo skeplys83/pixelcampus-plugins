@@ -18,7 +18,11 @@ public class ParkourWerte implements CommandExecutor{
         Player player = (Player)commandSender;
 
         if(strings.length == 1){
-            player.sendMessage("%parkour_course_record_" + strings[0] + "_time%");
+
+            player.sendMessage(PlaceholderAPI.setPlaceholders(player, "%parkour_course_record_" + strings[0] + "_time%"));
+        }
+        else{
+            player.sendMessage("Falsche Eingabe du Hurensohn");
         }
 
 
