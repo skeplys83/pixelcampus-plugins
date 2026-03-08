@@ -44,7 +44,7 @@ public class Schild implements Listener {
         }
 
         if(firstLine.equals("[1. Platz]")){
-            String score = player.getName() + PlaceholderAPI.setPlaceholders(player, " %parkour_course_record_" + secondLine + "_time%");
+            String score = player.getName() + " " + PlaceholderAPI.setPlaceholders(player, "%parkour_course_record_" + secondLine + "_time%");
             event.line(2, Component.text(score));
         }
     }
