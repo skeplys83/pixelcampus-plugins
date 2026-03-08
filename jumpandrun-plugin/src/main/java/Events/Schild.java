@@ -35,10 +35,10 @@ public class Schild implements Listener {
         List<String> lines = line.content().lines().toList();
         Player player = event.getPlayer();
 
-        log.atInfo().log(lines.toArray());
+        lines.forEach(x -> log.atInfo().log(line));
 
         if(lines.get(0).equals("[1. Platz]") && lines.size() != 2){
-            String score = player.getName() + PlaceholderAPI.setPlaceholders(player, "%parkour_course_record_" + "" + "_time%"); //lines.get(1)
+            String score = player.getName() + PlaceholderAPI.setPlaceholders(player, "%parkour_course_record_" + "Beispiel" + "_time%"); //lines.get(1)
 
             try {
                 event.line(2, Component.text(score));
