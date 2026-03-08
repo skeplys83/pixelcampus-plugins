@@ -4,4 +4,4 @@ main: org.pixelcampus.jumpnrun.Jumpnrun
 api-version: '1.21'
 commands:
   parkourwerte:
-softdepend: [PlaceholderAPI, Parkour]
+depend: [PlaceholderAPI, Parkour]

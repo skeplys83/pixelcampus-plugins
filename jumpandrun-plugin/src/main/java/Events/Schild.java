@@ -38,15 +38,18 @@ public class Schild implements Listener {
         String secondLine = PlainTextComponentSerializer.plainText().serialize(lines.get(1));
         Player player = event.getPlayer();
 
+        /* NICHT ANSCHAUEN; LÖSCHEN UND SELBER IMPLEMENTIEREN */
         if(firstLine.isBlank() || secondLine.isBlank()) {
             event.getPlayer().sendMessage("erste zeile muss [1. Platz] sein, zweite zeile die jump map. überprüfe das schild");
             return;
         }
 
         if(firstLine.equals("[1. Platz]")){
-            String score = PlaceholderAPI.setPlaceholders(player, "%parkour_course_record_" + secondLine + "_time%");
-            event.line(2, Component.text(player.getName()));
-            event.line(3, Component.text(score));
+            String topScore = PlaceholderAPI.setPlaceholders(player, "%parkour_course_record_" + secondLine + "_time%");
+            String topPlayer = PlaceholderAPI.setPlaceholders(player, "%parkour_course_record_" + secondLine + "_player%");
+            event.line(2, Component.text(topPlayer));
+            event.line(3, Component.text(topScore));
         }
+
     }
 }
