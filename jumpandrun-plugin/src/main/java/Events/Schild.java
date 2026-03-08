@@ -31,29 +31,21 @@ public class Schild implements Listener {
 
     @EventHandler
     public void onSignWrite(SignChangeEvent event){
-        TextComponent line = (TextComponent)event.line(0);
-        List<String> lines = line.content().lines().toList();
-        Player player = event.getPlayer();
+        List<Component> lines = event.lines();
+        lines.forEach(x -> log.atInfo().log(x));
 
-        lines.forEach(x -> log.atInfo().log(line));
-
-        if(lines.get(0).equals("[1. Platz]") && lines.size() != 2){
-            String score = player.getName() + PlaceholderAPI.setPlaceholders(player, "%parkour_course_record_" + "Beispiel" + "_time%"); //lines.get(1)
-
-            try {
-                event.line(2, Component.text(score));
-            }catch (Exception e) {
-                log.atInfo().log("couldnt write 3rd line");
-            }
-
-        } else{
-            event.getPlayer().sendMessage("erste zeile muss 1. Platz] sein, zweite zeile die jump map. überprüfe das schild");
+        if(lines.size() != 2) {
+            event.getPlayer().sendMessage("erste zeile muss [1. Platz] sein, zweite zeile die jump map. überprüfe das schild");
+            return;
         }
 
-        log.atInfo().log("test log :)");
+        Player player = event.getPlayer();
+        String firstLine = lines.getFirst().asComponent().toString();
+        String secondLine = lines.get(1).asComponent().toString();
 
-
+        if(firstLine.equals("[1. Platz]")){
+            String score = player.getName() + PlaceholderAPI.setPlaceholders(player, " %parkour_course_record_" + secondLine + "_time%");
+            event.line(2, Component.text(score));
+        }
     }
-
-
 }

@@ -9,7 +9,7 @@ public final class Jumpnrun extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getCommand("parkourwerte").setExecutor(new ParkourWerte());
+        //getCommand("parkourwerte").setExecutor(new ParkourWerte());
         getServer().getPluginManager().registerEvents(new Schild(), this);
     }
 
