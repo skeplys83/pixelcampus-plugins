@@ -3,5 +3,5 @@ version: '1.0'
 main: org.pixelcampus.jumpnrun.Jumpnrun
 api-version: '1.21'
 commands:
-  MeinName:
-
+  parkourwerte:
+softdepend: [PlaceholderAPI, Parkour]
