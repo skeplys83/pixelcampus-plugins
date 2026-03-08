@@ -13,6 +13,7 @@ public final class Jumpnrun extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new Schild(), this);
     }
 
+
     @Override
     public void onDisable() {
         // Plugin shutdown logic
