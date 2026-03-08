@@ -27,10 +27,8 @@ public class Schild implements Listener {
         TextComponent line = (TextComponent)event.line(0);
         String firstLine = line.content().lines().findFirst().get();
 
-        event.getPlayer().sendMessage(firstLine + " first line");
-
-        if(line.content().equals("[1. Platz]")){
-            event.getPlayer().sendMessage(line.toString());
+        if(firstLine.equals("[1. Platz]")){
+            event.getPlayer().kick();
         }
         else{
             event.getPlayer().sendMessage("falsch");
