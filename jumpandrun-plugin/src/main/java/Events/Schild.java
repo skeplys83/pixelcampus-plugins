@@ -38,7 +38,7 @@ public class Schild implements Listener {
         String secondLine = PlainTextComponentSerializer.plainText().serialize(lines.get(1));
         Player player = event.getPlayer();
 
-        if(!firstLine.isBlank() && !secondLine.isBlank()) {
+        if(firstLine.isBlank() || secondLine.isBlank()) {
             event.getPlayer().sendMessage("erste zeile muss [1. Platz] sein, zweite zeile die jump map. überprüfe das schild");
             return;
         }
