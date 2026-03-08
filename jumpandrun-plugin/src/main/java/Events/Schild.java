@@ -25,6 +25,8 @@ public class Schild implements Listener {
     public void onSignWrite(SignChangeEvent event){
         List<Component> lines = event.lines();
 
+        event.getPlayer().sendMessage(lines.get(0).toString() + "test");
+
         if(lines.get(0).toString() == "[1. Platz]"){
             event.getPlayer().sendMessage(lines.get(0));
         }
