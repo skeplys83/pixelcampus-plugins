@@ -9,9 +9,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 
 public class ParkourWerte implements CommandExecutor{
 
-    private static final String[] PARKOUR_PLACEHOLDERS = new String[]{
-            "%parkour_course_record_(course)_time%"
-    };
+
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String @NotNull [] strings) {
@@ -19,12 +17,13 @@ public class ParkourWerte implements CommandExecutor{
         if(!(commandSender instanceof Player))return false;
         Player player = (Player)commandSender;
 
-        player.sendMessage("Parkour placeholders:");
-
-        for (String placeholder : PARKOUR_PLACEHOLDERS) {
-            String parsed = PlaceholderAPI.setPlaceholders(player, placeholder);
-            player.sendMessage(parsed);
+        if(strings.length == 1){
+            player.sendMessage("%parkour_course_record_" + strings[0] + "_time%");
         }
+
+
+
+
 
         return true;
     }
