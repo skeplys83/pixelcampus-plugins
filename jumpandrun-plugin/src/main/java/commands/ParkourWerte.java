@@ -10,16 +10,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 public class ParkourWerte implements CommandExecutor{
 
     private static final String[] PARKOUR_PLACEHOLDERS = new String[]{
-            "%parkour_global_version%",
-            "%parkour_player_level%",
-            "%parkour_player_rank%",
-            "%parkour_player_personal_best_(course)_time%",
-            "%parkour_course_record_(course)_player%",
-            "%parkour_current_course_timer%",
-            "%parkour_current_checkpoint_next%",
-            "%parkour_leaderboard_(course)_(position)_time%",
-            "%parkour_topten_(course)_(position)%",
-            "%parkour_topfirstplaces_(position)%"
+            "%parkour_course_record_(course)_time%"
     };
 
     @Override
