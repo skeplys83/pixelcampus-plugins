@@ -16,7 +16,7 @@ public final class Smp extends JavaPlugin {
         getCommand("statsall").setExecutor(statsAllCommand);
         getCommand("statsall").setTabCompleter(statsAllCommand);
 
-        getServer().getPluginManager().registerEvents(new SpeedLadderListener(), this);
+        getServer().getPluginManager().registerEvents(new SpeedLadderListener(this), this);
     }
 
     @Override

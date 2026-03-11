@@ -88,8 +88,6 @@ public class StatsAllCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(Component.text(
                 "StatsAll - Sort: " + sortMode.displayName,
                 NamedTextColor.GOLD));
-        sender.sendMessage(Component.text("Online players are marked green.",
-                NamedTextColor.DARK_GRAY));
 
         allRows.sort(getComparator(sortMode));
 

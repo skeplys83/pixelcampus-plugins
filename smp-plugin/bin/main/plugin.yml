@@ -18,3 +18,6 @@ permissions:
   smp.stats.others:
     description: Allows viewing other players' stats
     default: op
+  smp.speedladder.use:
+    description: Allows using the speed ladder boost
+    default: true
