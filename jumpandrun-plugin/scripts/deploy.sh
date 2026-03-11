@@ -10,14 +10,14 @@ require_env() {
 }
 
 required_vars=(
-  JNR_SFTP_HOST
-  JNR_SFTP_PORT
-  JNR_SERVER_ID
-  JNR_PANEL_URL
-  JNR_SFTP_USER
-  JNR_SFTP_SSH_KEY
-  JNR_CLIENT_API_KEY
-  JNR_PLUGIN_FILE_NAME
+  PTERODACTYL_SFTP_HOST
+  PTERODACTYL_SFTP_PORT
+  JUMPANDRUN_SERVER_ID
+  PTERODACTYL_PANEL_URL
+  PTERODACTYL_TESTSERVER_SFTP_USER
+  PTERODACTYL_SFTP_SSH_KEY
+  PTERODACTYL_API_KEY
+  JUMPANDRUN_PLUGIN_FILE_NAME
 )
 
 for var_name in "${required_vars[@]}"; do
@@ -39,27 +39,27 @@ echo "Built: $JAR_PATH"
 
 # Prepare SSH key for SFTP
 mkdir -p ~/.ssh
-printf '%s\n' "$JNR_SFTP_SSH_KEY" > ~/.ssh/id_ed25519
+printf '%s\n' "$PTERODACTYL_SFTP_SSH_KEY" > ~/.ssh/id_ed25519
 chmod 600 ~/.ssh/id_ed25519
 
-echo "Uploading via SFTP to ${JNR_SFTP_HOST}:${JNR_SFTP_PORT}"
+echo "Uploading via SFTP to ${PTERODACTYL_SFTP_HOST}:${PTERODACTYL_SFTP_PORT}"
 sftp -v \
   -o StrictHostKeyChecking=accept-new \
   -o ConnectTimeout=20 \
   -o ConnectionAttempts=3 \
   -o KexAlgorithms=curve25519-sha256@libssh.org,diffie-hellman-group14-sha256 \
   -i ~/.ssh/id_ed25519 \
-  -P "$JNR_SFTP_PORT" \
-  "$JNR_SFTP_USER@$JNR_SFTP_HOST" <<EOF
-put "$JAR_PATH" "/plugins/$JNR_PLUGIN_FILE_NAME"
+  -P "$PTERODACTYL_SFTP_PORT" \
+  "$PTERODACTYL_TESTSERVER_SFTP_USER@$PTERODACTYL_SFTP_HOST" <<EOF
+put "$JAR_PATH" "/plugins/$JUMPANDRUN_PLUGIN_FILE_NAME"
 bye
 EOF
 
 echo "Uploaded plugin"
 
 # Restart server
-HTTP_CODE=$(curl -sS -o /tmp/jnr_restart_response.json -w "%{http_code}" -X POST "$JNR_PANEL_URL/api/client/servers/$JNR_SERVER_ID/power" \
-  -H "Authorization: Bearer $JNR_CLIENT_API_KEY" \
+HTTP_CODE=$(curl -sS -o /tmp/jnr_restart_response.json -w "%{http_code}" -X POST "$PTERODACTYL_PANEL_URL/api/client/servers/$JUMPANDRUN_SERVER_ID/power" \
+  -H "Authorization: Bearer $PTERODACTYL_API_KEY" \
   -H "Accept: application/vnd.pterodactyl.v1+json" \
   -H "Content-Type: application/json" \
   -d '{"signal":"restart"}')
