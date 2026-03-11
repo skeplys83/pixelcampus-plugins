@@ -59,17 +59,11 @@ EOF
 
 echo "Uploaded plugin"
 
-# Restart server
-HTTP_CODE=$(curl -sS -o /tmp/jnr_restart_response.json -w "%{http_code}" -X POST "$PTERODACTYL_PANEL_URL/api/client/servers/$JUMPANDRUN_SERVER_ID/power" \
+# Notify all players that a new plugin version has been deployed
+curl -sS -o /dev/null -X POST "$PTERODACTYL_PANEL_URL/api/client/servers/$JUMPANDRUN_SERVER_ID/command" \
   -H "Authorization: Bearer $PTERODACTYL_API_KEY" \
   -H "Accept: application/vnd.pterodactyl.v1+json" \
   -H "Content-Type: application/json" \
-  -d '{"signal":"restart"}')
+  -d '{"command":"tellraw @a {\"text\":\"A new plugin version for smp-plugin has been deployed. Please restart the server.\",\"color\":\"yellow\"}"}' || true
 
-if [[ ! "$HTTP_CODE" =~ ^[0-9]{3}$ ]] || (( HTTP_CODE < 200 || HTTP_CODE >= 300 )); then
-  echo "Restart request failed with HTTP $HTTP_CODE" >&2
-  cat /tmp/jnr_restart_response.json >&2 || true
-  exit 1
-fi
-
-echo "Deployment finished."
+echo "Deployment finished. Please restart the server manually."
