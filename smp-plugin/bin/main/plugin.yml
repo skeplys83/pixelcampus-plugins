@@ -3,7 +3,18 @@ version: '1.0'
 main: org.pixelcampus.smp.Smp
 api-version: '1.21'
 commands:
-  test:
-    description: test command
-    usage: /test
+  stats:
+    description: Shows stats for yourself or a specified player
+    usage: /stats [player]
     aliases: []
+  statsall:
+    description: Shows stats for all players, optionally sorted by mode
+    usage: /statsall [playtime|deaths|streak|kills|blocks|distance]
+    aliases: []
+permissions:
+  smp.stats.self:
+    description: Allows viewing your own stats
+    default: true
+  smp.stats.others:
+    description: Allows viewing other players' stats
+    default: op

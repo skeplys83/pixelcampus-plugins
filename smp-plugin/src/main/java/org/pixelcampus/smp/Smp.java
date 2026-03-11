@@ -1,19 +1,22 @@
 package org.pixelcampus.smp;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.pixelcampus.smp.features.speedladder.SpeedLadderListener;
+import org.pixelcampus.smp.features.stats.commands.StatsAllCommand;
+import org.pixelcampus.smp.features.stats.commands.StatsCommand;
 
 public final class Smp extends JavaPlugin {
 
     @Override
     public void onEnable() {
         // Plugin startup logic
+        StatsAllCommand statsAllCommand = new StatsAllCommand();
 
-        getCommand("test")
-                .setExecutor((sender, command, label, args) -> {
-                    sender.sendMessage(Component.text("Hello, world!"));
-                    return true;
-                });
+        getCommand("stats").setExecutor(new StatsCommand());
+        getCommand("statsall").setExecutor(statsAllCommand);
+        getCommand("statsall").setTabCompleter(statsAllCommand);
+
+        getServer().getPluginManager().registerEvents(new SpeedLadderListener(), this);
     }
 
     @Override
