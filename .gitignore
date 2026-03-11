@@ -5,13 +5,14 @@
 Thumbs.db
 
 # ======================
-# IntelliJ / JetBrains
+# IntelliJ / JetBrains / VSCODE junk
 # ======================
 .idea/
 *.iml
 *.ipr
 *.iws
 out/
+.vscode/
 
 # ======================
 # Gradle

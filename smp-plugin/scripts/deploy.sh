@@ -12,9 +12,9 @@ require_env() {
 # Non-secret deployment settings.
 readonly PTERODACTYL_SFTP_HOST="node-01.pterodactyl.reutlingen.university"
 readonly PTERODACTYL_SFTP_PORT="25022"
-readonly TESTSERVER_SERVER_ID="138c081c"
+readonly JUMPANDRUN_SERVER_ID="138c081c"
 readonly PTERODACTYL_PANEL_URL="https://panel.pterodactyl.reutlingen.university"
-readonly JUMPANDRUN_PLUGIN_FILE_NAME="Pixelcampus-Jumpnrun.jar"
+readonly JUMPANDRUN_PLUGIN_FILE_NAME="Pixelcampus-SMP.jar"
 
 required_vars=(
   PTERODACTYL_TESTSERVER_SFTP_USER
@@ -60,7 +60,7 @@ EOF
 echo "Uploaded plugin"
 
 # Restart server
-HTTP_CODE=$(curl -sS -o /tmp/jnr_restart_response.json -w "%{http_code}" -X POST "$PTERODACTYL_PANEL_URL/api/client/servers/$TESTSERVER_SERVER_ID/power" \
+HTTP_CODE=$(curl -sS -o /tmp/jnr_restart_response.json -w "%{http_code}" -X POST "$PTERODACTYL_PANEL_URL/api/client/servers/$JUMPANDRUN_SERVER_ID/power" \
   -H "Authorization: Bearer $PTERODACTYL_API_KEY" \
   -H "Accept: application/vnd.pterodactyl.v1+json" \
   -H "Content-Type: application/json" \

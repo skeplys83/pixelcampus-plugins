@@ -1,4 +1,4 @@
-name: smp
+name: Pixelcampus SMP
 version: '1.0'
 main: org.pixelcampus.smp.Smp
 api-version: '1.21'
