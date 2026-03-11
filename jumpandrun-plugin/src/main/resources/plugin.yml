@@ -1,4 +1,4 @@
-name: Pixelcampus Jumpnrun
+name: Pixelcampus-Jumpnrun
 version: '1.0'
 main: org.pixelcampus.jumpnrun.Jumpnrun
 api-version: '1.21'

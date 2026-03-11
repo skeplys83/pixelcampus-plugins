@@ -64,6 +64,6 @@ curl -sS -o /dev/null -X POST "$PTERODACTYL_PANEL_URL/api/client/servers/$JUMPAN
   -H "Authorization: Bearer $PTERODACTYL_API_KEY" \
   -H "Accept: application/vnd.pterodactyl.v1+json" \
   -H "Content-Type: application/json" \
-  -d '{"command":"tellraw @a {\"text\":\"A new plugin version for smp-plugin has been deployed. Please restart the server.\",\"color\":\"yellow\"}"}' || true
+  -d '{"command":"tellraw @a {\"text\":\"A new plugin version for jumpandrun-plugin has been deployed. Please restart the server.\",\"color\":\"yellow\"}"}' || true
 
 echo "Deployment finished. Please restart the server manually."
