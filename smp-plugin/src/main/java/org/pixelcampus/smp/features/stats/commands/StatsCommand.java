@@ -31,7 +31,7 @@ public class StatsCommand implements CommandExecutor {
             OfflinePlayer target = sender instanceof OfflinePlayer ? (OfflinePlayer) sender
                     : Bukkit.getOfflinePlayer("Notch");
 
-            sender.sendMessage(PlayerStatsHelper.formatStatsMessage(target));
+            sender.sendMessage(PlayerStatsHelper.formatStatsMessage(target, PlayerStatsHelper.queryStats(target)));
             return true;
         }
 
@@ -47,7 +47,7 @@ public class StatsCommand implements CommandExecutor {
             return true;
         }
 
-        sender.sendMessage(PlayerStatsHelper.formatStatsMessage(target));
+        sender.sendMessage(PlayerStatsHelper.formatStatsMessage(target, PlayerStatsHelper.queryStats(target)));
         return true;
     }
 }

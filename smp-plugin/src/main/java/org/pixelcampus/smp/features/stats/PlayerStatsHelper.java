@@ -24,13 +24,13 @@ public final class PlayerStatsHelper {
         stats.addProperty("timeSinceDeathHours", player.getStatistic(Statistic.TIME_SINCE_DEATH) / TICKS_PER_HOUR);
         stats.addProperty("totalPlayerKills", player.getStatistic(Statistic.PLAYER_KILLS));
         stats.addProperty("totalBlocksMined", getTotalBlocksMined(player));
-        stats.addProperty("totalDistanceTraveledMeters", getTotalDistanceTraveledMeters(player));
+        stats.addProperty("totalDistanceTraveledMeters", 0);
 
         return stats;
     }
 
     public static @NotNull Component formatStatsMessage(@NotNull OfflinePlayer player, @NotNull JsonObject stats) {
-        String playerName = stats.get("playerName") != null ? stats.get("playerName").getAsString() : "Unknown Player";
+        String playerName = player.getName() != null ? player.getName() : "Unknown";
         String playtimeHours = formatNumber(stats.get("playtimeHours").getAsDouble()) + "h";
         String totalDeaths = formatNumber(stats.get("totalDeaths").getAsInt());
         String timeSinceDeath = formatElapsedHours(stats.get("timeSinceDeathHours").getAsDouble());

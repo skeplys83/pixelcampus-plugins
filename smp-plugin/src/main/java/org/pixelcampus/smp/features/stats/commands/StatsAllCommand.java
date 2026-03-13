@@ -95,7 +95,16 @@ public class StatsAllCommand implements CommandExecutor, TabCompleter {
                 if (!offlinePlayer.hasPlayedBefore() && !offlinePlayer.isOnline()) {
                     continue;
                 }
-                allRows.add(new PlayerStatsRow(offlinePlayer, PlayerStatsHelper.queryStats(offlinePlayer)));
+
+                JsonObject stats = PlayerStatsHelper.queryStats(offlinePlayer);
+
+                // dont list players with less than 6 minutes of playtime to avoid cluttering
+                // the list with inactive players
+                if (stats.get("playtimeHours").getAsDouble() < 0.1) {
+                    continue;
+                }
+
+                allRows.add(new PlayerStatsRow(offlinePlayer, stats));
             }
 
             if (allRows.isEmpty()) {
