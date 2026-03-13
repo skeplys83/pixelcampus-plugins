@@ -27,7 +27,7 @@ public class SpeedLadderListener implements Listener {
 
     private static final String PERM_USE = "smp.speedladder.use";
     private static final float MAX_LOOK_UP_PITCH = -20.0f;
-    private static final double UPWARD_BOOST = 0.42;
+    private static final double UPWARD_BOOST = 0.67;
     private static final BlockFace[] CARDINAL_FACES = {
             BlockFace.NORTH,
             BlockFace.SOUTH,

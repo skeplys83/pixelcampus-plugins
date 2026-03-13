@@ -1,5 +1,6 @@
 package org.pixelcampus.smp.features.stats.commands;
 
+import com.google.common.math.Stats;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,12 +14,18 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.pixelcampus.smp.features.stats.PlayerStatsHelper;
 
 public class StatsAllCommand implements CommandExecutor, TabCompleter {
 
     private static final String PERM_ALL = "smp.stats.others";
+    private final Plugin plugin;
+
+    public StatsAllCommand(Plugin plugin) {
+        this.plugin = plugin;
+    }
 
     private enum SortMode {
         PLAYTIME("playtime", "Playtime"),
@@ -63,45 +70,59 @@ public class StatsAllCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        SortMode sortMode = SortMode.PLAYTIME;
+        // gets the sort mode from the first argument, or defaults to playtime if no
+        // argument is provided
+        final SortMode sortMode;
         if (args.length == 1) {
             SortMode parsed = SortMode.fromInput(args[0]);
             if (parsed == null) {
                 return false;
             }
             sortMode = parsed;
+        } else {
+            sortMode = SortMode.PLAYTIME;
         }
 
-        List<PlayerStatsRow> allRows = new ArrayList<>();
-        for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
-            if (!offlinePlayer.hasPlayedBefore() && !offlinePlayer.isOnline()) {
-                continue;
+        // Load stats asynchronously to avoid blocking the main thread
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            List<PlayerStatsRow> allRows = new ArrayList<>();
+
+            sender.sendMessage("Loading player stats...");
+
+            for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+                if (!offlinePlayer.hasPlayedBefore() && !offlinePlayer.isOnline()) {
+                    continue;
+                }
+                allRows.add(new PlayerStatsRow(offlinePlayer, PlayerStatsHelper.queryStats(offlinePlayer)));
             }
-            allRows.add(new PlayerStatsRow(offlinePlayer, PlayerStatsHelper.queryStats(offlinePlayer)));
-        }
 
-        if (allRows.isEmpty()) {
-            sender.sendMessage("No player stats found.");
-            return true;
-        }
+            if (allRows.isEmpty()) {
+                sender.sendMessage("No player stats found.");
+                return;
+            }
 
-        sender.sendMessage(Component.text(
-                "StatsAll - Sort: " + sortMode.displayName,
-                NamedTextColor.GOLD));
+            // Sort and send results back on the main thread
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                sender.sendMessage(Component.text(
+                        "StatsAll - Sort: " + sortMode.displayName,
+                        NamedTextColor.GOLD));
 
-        allRows.sort(getComparator(sortMode));
+                allRows.sort(getComparator(sortMode));
 
-        for (int i = 0; i < allRows.size(); i++) {
-            PlayerStatsRow row = allRows.get(i);
-            int rank = i + 1;
+                for (int i = 0; i < allRows.size(); i++) {
+                    PlayerStatsRow row = allRows.get(i);
+                    int rank = i + 1;
 
-            Component line = Component.text()
-                    .append(Component.text("#" + rank + " ", NamedTextColor.DARK_GRAY))
-                    .append(PlayerStatsHelper.formatStatsMessage(row.player))
-                    .build();
+                    Component line = Component.text()
+                            .append(Component.text("#" + rank + " ", NamedTextColor.DARK_GRAY))
+                            .append(PlayerStatsHelper.formatStatsMessage(row.player))
+                            .build();
 
-            sender.sendMessage(line);
-        }
+                    sender.sendMessage(line);
+                }
+            });
+        });
+
         return true;
     }
 

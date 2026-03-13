@@ -10,7 +10,7 @@ public final class Smp extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        StatsAllCommand statsAllCommand = new StatsAllCommand();
+        StatsAllCommand statsAllCommand = new StatsAllCommand(this);
 
         getCommand("stats").setExecutor(new StatsCommand());
         getCommand("statsall").setExecutor(statsAllCommand);
