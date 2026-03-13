@@ -29,10 +29,8 @@ public final class PlayerStatsHelper {
         return stats;
     }
 
-    public static @NotNull Component formatStatsMessage(@NotNull OfflinePlayer player) {
-        JsonObject stats = queryStats(player);
-
-        String playerName = player.getName() != null ? player.getName() : player.getUniqueId().toString();
+    public static @NotNull Component formatStatsMessage(@NotNull OfflinePlayer player, @NotNull JsonObject stats) {
+        String playerName = stats.get("playerName") != null ? stats.get("playerName").getAsString() : "Unknown Player";
         String playtimeHours = formatNumber(stats.get("playtimeHours").getAsDouble()) + "h";
         String totalDeaths = formatNumber(stats.get("totalDeaths").getAsInt());
         String timeSinceDeath = formatElapsedHours(stats.get("timeSinceDeathHours").getAsDouble());

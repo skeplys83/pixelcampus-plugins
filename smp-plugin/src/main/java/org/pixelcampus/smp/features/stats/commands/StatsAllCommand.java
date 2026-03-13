@@ -115,7 +115,7 @@ public class StatsAllCommand implements CommandExecutor, TabCompleter {
 
                 Component line = Component.text()
                         .append(Component.text("#" + rank + " ", NamedTextColor.DARK_GRAY))
-                        .append(PlayerStatsHelper.formatStatsMessage(row.player))
+                        .append(PlayerStatsHelper.formatStatsMessage(row.player, row.stats))
                         .build();
 
                 sender.sendMessage(line);
