@@ -2,27 +2,27 @@ package org.pixelcampus.smp.features.stats;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Statistic;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class StatsCommand implements CommandExecutor, TabCompleter {
+public class StatsAllCommand implements CommandExecutor, TabCompleter {
 
-    private static final String PERM_ONLINE = "smp.stats.online";
+    private static final String PERM_ALL = "smp.stats.all";
+    private static final int MIN_PLAYTIME_TICKS = 7200; // 0.1h * 20 * 60 * 60
     private final Plugin plugin;
 
-    public StatsCommand(@NotNull Plugin plugin) {
+    public StatsAllCommand(@NotNull Plugin plugin) {
         this.plugin = plugin;
     }
 
@@ -34,74 +34,62 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
             return false;
         }
 
-        if (args.length == 0) {
-            if (!sender.hasPermission(PERM_ONLINE)) {
-                sender.sendMessage("You don't have permission to view all player stats.");
-                return true;
+        if (!sender.hasPermission(PERM_ALL)) {
+            sender.sendMessage("You don't have permission to view all player stats.");
+            return true;
+        }
+
+        StatsHelper.SortMode sortMode = StatsHelper.SortMode.PLAYTIME;
+        if (args.length == 1) {
+            StatsHelper.SortMode parsed = StatsHelper.SortMode.fromInput(args[0]);
+            if (parsed == null) {
+                return false;
             }
-
-            sendOnlineLeaderboardAsync(sender, StatsHelper.SortMode.PLAYTIME);
-            return true;
+            sortMode = parsed;
         }
 
-        String arg = args[0];
-        StatsHelper.SortMode sortMode = StatsHelper.SortMode.fromInput(arg);
-        if (sortMode != null) {
-            if (!sender.hasPermission(PERM_ONLINE)) {
-                sender.sendMessage("You don't have permission to view all player stats.");
-                return true;
-            }
-
-            sendOnlineLeaderboardAsync(sender, sortMode);
-            return true;
-        }
-
-        OfflinePlayer target = Bukkit.getOfflinePlayer(arg);
-        if (!target.hasPlayedBefore() && !target.isOnline()) {
-            sender.sendMessage("Player '" + arg + "' has never played on this server.");
-            return true;
-        }
-
-        if (!sender.hasPermission(PERM_ONLINE)) {
-            sender.sendMessage("You don't have permission to view other players' stats.");
-            return true;
-        }
-
-        sender.sendMessage(StatsHelper.formatStatsMessage(target, StatsHelper.queryStats(target)));
+        sendLeaderboardAsync(sender, sortMode);
         return true;
     }
 
     /**
-     * Builds and sends the top player stats leaderboard without blocking command
-     * execution.
+     * Builds and sends the full leaderboard (online + offline players)
+     * asynchronously.
      *
      * <p>
-     * The method loads all offline players asynchronously, keeps only players with
-     * at least {@code MIN_PLAYTIME_TICKS}, trims the candidate set to
-     * {@code MAX_PLAYERS} by playtime, queries full stats for that subset, then
-     * applies the requested sort mode before sending formatted lines to the sender.
+     * The method iterates through all known offline players from Bukkit, skips
+     * players
+     * that have never joined, queries stats, applies the selected sort mode, and
+     * sends
+     * ranked output to the command sender.
      * </p>
      *
      * @param sender   recipient of loading/status and leaderboard messages
-     * @param sortMode stat field used for final leaderboard ordering
+     * @param sortMode stat field used for leaderboard ordering
      */
-    private void sendOnlineLeaderboardAsync(@NotNull CommandSender sender, @NotNull StatsHelper.SortMode sortMode) {
+    private void sendLeaderboardAsync(@NotNull CommandSender sender, @NotNull StatsHelper.SortMode sortMode) {
         plugin.getServer().getAsyncScheduler().runNow(plugin, task -> {
             List<StatsHelper.PlayerStatsRow> allRows = new ArrayList<>();
 
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                allRows.add(new StatsHelper.PlayerStatsRow(onlinePlayer, StatsHelper.queryStats(onlinePlayer)));
+            sender.sendMessage("Loading all player stats.. This may take a while.");
+            for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+                int playtimeTicks = offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE);
+                if ((!offlinePlayer.hasPlayedBefore() && !offlinePlayer.isOnline())
+                        || playtimeTicks < MIN_PLAYTIME_TICKS) {
+                    continue;
+                }
+                allRows.add(new StatsHelper.PlayerStatsRow(offlinePlayer, StatsHelper.queryStats(offlinePlayer)));
             }
 
             if (allRows.isEmpty()) {
-                sender.sendMessage("No online player stats found.");
+                sender.sendMessage("No player stats found.");
                 return;
             }
 
             allRows.sort(getComparator(sortMode));
 
             sender.sendMessage(Component.text(
-                    "Stats (Online) - Sort: " + sortMode.displayName(),
+                    "Statistics - Sort: " + sortMode.displayName(),
                     NamedTextColor.GOLD));
 
             for (int i = 0; i < allRows.size(); i++) {
@@ -126,23 +114,15 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
         }
 
         String prefix = args[0].toLowerCase(Locale.ROOT);
-        LinkedHashSet<String> suggestions = new LinkedHashSet<>();
+        List<String> suggestions = new ArrayList<>();
 
-        // Suggest sort modes first, then player names.
         for (StatsHelper.SortMode mode : StatsHelper.SortMode.values()) {
             if (mode.key().startsWith(prefix)) {
                 suggestions.add(mode.key());
             }
         }
 
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            String name = onlinePlayer.getName();
-            if (name.toLowerCase(Locale.ROOT).startsWith(prefix)) {
-                suggestions.add(name);
-            }
-        }
-
-        return new ArrayList<>(suggestions);
+        return suggestions;
     }
 
     private @NotNull Comparator<StatsHelper.PlayerStatsRow> getComparator(@NotNull StatsHelper.SortMode sortMode) {

@@ -5,15 +5,21 @@ api-version: '1.21'
 folia-supported: true
 commands:
   stats:
-    description: Shows top player stats or a single player's stats
+    description: Shows online leaderboard stats or a single player's stats
     usage: /stats [player|playtime|deaths|streak|kills|blocks|distance]
+    permission: smp.stats.online
+    aliases: []
+  statsall:
+    description: Shows leaderboard stats for all players (online and offline)
+    usage: /statsall [playtime|deaths|streak|kills|blocks|distance]
+    permission: smp.stats.all
     aliases: []
 permissions:
-  smp.stats.self:
-    description: Allows viewing your own stats
+  smp.stats.online:
+    description: Allows viewing online players' stats
     default: true
-  smp.stats.others:
-    description: Allows viewing other players' stats
+  smp.stats.all:
+    description: Allows viewing all players' stats
     default: op
   smp.speedladder.use:
     description: Allows using the speed ladder boost

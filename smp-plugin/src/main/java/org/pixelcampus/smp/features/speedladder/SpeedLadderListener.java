@@ -24,7 +24,7 @@ public class SpeedLadderListener implements Listener {
 
     private static final double UPWARD_BOOST = 0.67;
     private static final int SOUND_TICK_INTERVAL = 4;
-
+    private static final String PERM_USE = "smp.speedladder.use";
     private static final Component CLIMB_HINT = Component.text("Hold sneak to boost", NamedTextColor.GRAY);
 
     private final Set<UUID> activeBoostPlayers = ConcurrentHashMap.newKeySet();
@@ -40,14 +40,19 @@ public class SpeedLadderListener implements Listener {
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (SpeedLadderHelper.canBoostWithoutSneak(player) && !player.isSneaking()) {
+        if (player.hasPermission(PERM_USE) && SpeedLadderHelper.canBoostWithoutSneak(player) && !player.isSneaking()) {
             player.sendActionBar(CLIMB_HINT);
         }
     }
 
     @EventHandler
     public void onPlayerToggleSneak(@NotNull PlayerToggleSneakEvent event) {
-        UUID playerId = event.getPlayer().getUniqueId();
+        Player player = event.getPlayer();
+        if (!player.hasPermission(PERM_USE)) {
+            return;
+        }
+
+        UUID playerId = player.getUniqueId();
         if (event.isSneaking()) {
             activeBoostPlayers.add(playerId);
         } else {
