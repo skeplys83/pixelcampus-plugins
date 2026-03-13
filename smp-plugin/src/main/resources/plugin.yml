@@ -2,6 +2,7 @@ name: Pixelcampus-SMP
 version: '1.0'
 main: org.pixelcampus.smp.Smp
 api-version: '1.21'
+folia-supported: true
 commands:
   stats:
     description: Shows stats for yourself or a specified player

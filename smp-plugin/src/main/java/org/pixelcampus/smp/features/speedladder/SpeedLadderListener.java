@@ -1,11 +1,13 @@
 package org.pixelcampus.smp.features.speedladder;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -33,10 +35,13 @@ public class SpeedLadderListener implements Listener {
             BlockFace.WEST
     };
 
-    private final Set<UUID> activeBoostPlayers = new HashSet<>();
+    private final Set<UUID> activeBoostPlayers = ConcurrentHashMap.newKeySet();
+
+    public final JavaPlugin plugin;
 
     public SpeedLadderListener(@NotNull JavaPlugin plugin) {
-        plugin.getServer().getScheduler().runTaskTimer(plugin, this::tickBoostPlayers, 1L, 1L);
+        this.plugin = plugin;
+        plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, task -> tickBoostPlayers(), 1L, 1L);
     }
 
     @EventHandler
@@ -65,22 +70,35 @@ public class SpeedLadderListener implements Listener {
     }
 
     private void tickBoostPlayers() {
-        Iterator<UUID> iterator = activeBoostPlayers.iterator();
-        while (iterator.hasNext()) {
-            UUID playerId = iterator.next();
-            Player player = Bukkit.getPlayer(playerId);
+        activeBoostPlayers.forEach(playerUUID -> {
+            Player player = Bukkit.getPlayer(playerUUID);
 
-            if (player == null || !canBoost(player)) {
-                iterator.remove();
-                continue;
+            if (player == null) {
+                activeBoostPlayers.remove(playerUUID);
+                return;
             }
 
-            Vector velocity = player.getVelocity();
-            velocity.setY(Math.max(velocity.getY(), UPWARD_BOOST));
-            player.setVelocity(velocity);
-            player.setFallDistance(0.0f);
-            spawnBoostParticles(player);
-        }
+            player.getScheduler().run(plugin, t -> {
+                if (!canBoost(player)) {
+                    activeBoostPlayers.remove(playerUUID);
+                    return;
+                }
+
+                Vector v = player.getVelocity();
+                v.setY(Math.max(v.getY(), UPWARD_BOOST));
+                player.setVelocity(v);
+                player.setFallDistance(0.0f);
+                spawnBoostParticles(player);
+            }, () -> {
+                activeBoostPlayers.remove(playerUUID);
+            });
+        });
+
+        // Iterator<UUID> iterator = activeBoostPlayers.iterator();
+        // while (iterator.hasNext()) {
+        // UUID playerId = iterator.next();
+
+        // }
     }
 
     private void spawnBoostParticles(@NotNull Player player) {
@@ -113,12 +131,13 @@ public class SpeedLadderListener implements Listener {
         Block feet = player.getLocation().getBlock();
         Block eye = player.getEyeLocation().getBlock();
 
-        if (isClimbable(feet) || isClimbable(eye) || isClimbable(feet.getRelative(BlockFace.DOWN))) {
+        if (isClimbable(feet.getType()) || isClimbable(eye.getType())
+                || isClimbable(feet.getRelative(BlockFace.DOWN).getType())) {
             return true;
         }
 
         for (BlockFace face : CARDINAL_FACES) {
-            if (isClimbable(feet.getRelative(face)) || isClimbable(eye.getRelative(face))) {
+            if (isClimbable(feet.getRelative(face).getType()) || isClimbable(eye.getRelative(face).getType())) {
                 return true;
             }
         }
@@ -126,7 +145,7 @@ public class SpeedLadderListener implements Listener {
         return false;
     }
 
-    private boolean isClimbable(@NotNull Block block) {
-        return Tag.CLIMBABLE.isTagged(block.getType());
+    private boolean isClimbable(@NotNull Material blockType) {
+        return Tag.CLIMBABLE.isTagged(blockType);
     }
 }
