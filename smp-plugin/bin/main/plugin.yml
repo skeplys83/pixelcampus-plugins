@@ -5,12 +5,8 @@ api-version: '1.21'
 folia-supported: true
 commands:
   stats:
-    description: Shows stats for yourself or a specified player
-    usage: /stats [player]
-    aliases: []
-  statsall:
-    description: Shows stats for all players, optionally sorted by mode
-    usage: /statsall [playtime|deaths|streak|kills|blocks|distance]
+    description: Shows top player stats or a single player's stats
+    usage: /stats [player|playtime|deaths|streak|kills|blocks|distance]
     aliases: []
 permissions:
   smp.stats.self:
