@@ -1,32 +1,25 @@
 # pixelcampus-plugins
 
-Monorepo for PixelCampus Minecraft server plugins.
+Monorepo for PixelCampus Minecraft plugins.
 
-The repository contains multiple standalone Java plugin projects (Folia/Paper/Bukkit-compatible, Java 21), one folder per server/domain.
+Each plugin is a standalone Java project (Paper/Folia/Bukkit API, Java 21) with its own Gradle build and release flow.
 
 ## What is in this repo
 
 ```
 pixelcampus-plugins/
-|- smp-plugin/          # Survival plugin project
-|- jumpandrun-plugin/   # Jump and Run plugin project
-|- .github/workflows/   # One CI/CD workflow file per plugin
+|- smp-plugin/
+|- jumpandrun-plugin/
+|- .github/workflows/
 |- LICENSE
 `- README.md
 ```
 
-Each plugin folder is a separate Gradle project with its own:
-- `build.gradle`
-- `settings.gradle`
-- `gradlew`/`gradlew.bat`
-- `gradle/wrapper/gradle-wrapper.jar`
-- `src/main/java` and `src/main/resources/plugin.yml`
-
-## Build locally (Gradle)
+## Build and deploy locally
 
 Requirements:
 - Java 21
-- The Gradle wrapper files in each plugin project, especially `gradle/wrapper/gradle-wrapper.jar`
+- Gradle wrapper files present in each plugin project, especially `gradle/wrapper/gradle-wrapper.jar`
 
 Build a plugin:
 
@@ -35,75 +28,46 @@ cd smp-plugin
 ./gradlew clean build
 ```
 
-or:
-
-```bash
-cd jumpandrun-plugin
-./gradlew clean build
-```
-
-## Deploy to local dev server
-
-The intended local flow is:
-
-```bash
-./gradlew build deployToLocalServer
-```
-
-To use this, set your local Paper/Folia test server plugin folder in `build.gradle`:
+Test locally. For this, set your local Paper/Folia server plugin path in `build.gradle`::
 
 ```groovy
 def localServerPluginsDir = file("/absolute/path/to/your/server/plugins")
 ```
 
-Notes:
-- `smp-plugin/build.gradle` already defines `deployToLocalServer`.
-- `jumpandrun-plugin/build.gradle` currently has this task template commented out. Uncomment/adapt it before using `deployToLocalServer` there.
-
-Optional for fast local testing:
-
 ```bash
-./gradlew runServer
+./gradlew build deployToLocalServer
 ```
 
 ## GitHub Actions workflow model
 
-This repo uses one workflow file per plugin for build/release and one for release-based deploy:
+Workflow files:
 - `.github/workflows/release-smp.yml`
 - `.github/workflows/release-jumpandrun.yml`
 - `.github/workflows/deploy-smp-on-release.yml`
 - `.github/workflows/deploy-jumpandrun-on-release.yml`
 
-Each workflow triggers independently:
-- Release workflows:
-	- On `push` of plugin tags (`smp-v*`, `jumpandrun-v*`)
-	- On manual `workflow_dispatch`
-- Deploy workflows:
-	- On GitHub `release.published`
-	- Filtered by release tag prefix (`smp-v*` or `jumpandrun-v*`)
+Release tag patterns:
+- SMP: `smp-v*`
+- JumpAndRun: `jumpandrun-v*`
 
-High-level workflow steps:
-1. Checkout code
-2. Setup Java 21
-3. Make plugin `scripts/deploy.sh` executable
-4. Verify SFTP connectivity from the runner
-5. Set runner MTU (workaround for upload stability)
-6. Run plugin-specific deploy script
-
-Each deploy script then:
-1. Uploads the release jar to server `/plugins/` via SFTP (SSH key from secrets)
-2. Calls the Pterodactyl API to notify in-game players
+Pipeline (simplified):
+1. Tag push (example: `smp-v1.0.0`)
+2. Matching release workflow builds plugin jar and creates a GitHub Release with that jar attached
+3. Publishing that release triggers the matching deploy workflow
+4. Deploy workflow downloads the jar asset from the GitHub Release
+5. Deploy workflow calls plugin `scripts/deploy.sh`
+6. `deploy.sh` uploads the jar via SFTP to Pterodactyl (`/plugins/...jar`) and sends a restart notice via API
+7. Plugin jar is on the server (manual restart applies the update)
 
 ## Adding a new plugin to the monorepo
 
 1. Create `<new-plugin>/` at repo root as a standalone Gradle project.
-2. Add a dedicated workflow file under `.github/workflows/` for that plugin.
-3. Use `paths` filter so only that plugin's changes trigger its deployment workflow.
+2. Add a release workflow (`release-<plugin>.yml`) with a dedicated tag prefix.
+3. Add a deploy-on-release workflow (`deploy-<plugin>-on-release.yml`) filtered to that tag prefix.
+4. Add a plugin-specific `scripts/deploy.sh` that uploads `DEPLOY_JAR_PATH`.
 
-## License and usage
+## License
 
 This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
-GPL allows usage, modification, and redistribution under the same GPL terms.
-
-See `LICENSE` for the full license text.
+See `LICENSE` for the full text.
