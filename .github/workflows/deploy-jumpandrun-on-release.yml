@@ -1,4 +1,4 @@
-name: Deploy JumpAndRun plugin
+name: Deploy JumpAndRun to Pterodactyl (on release)
 
 on:
   release:
@@ -49,19 +49,6 @@ jobs:
 
       - name: Make deploy script executable
         run: chmod +x jumpandrun-plugin/scripts/deploy.sh
-
-      - name: Check SFTP connectivity from runner
-        env:
-          PTERODACTYL_SFTP_HOST: node-01.pterodactyl.reutlingen.university
-          PTERODACTYL_SFTP_PORT: "25022"
-        run: |
-          echo "Runner public IP: $(curl -s https://api.ipify.org)"
-          echo "Checking reachability: ${PTERODACTYL_SFTP_HOST}:${PTERODACTYL_SFTP_PORT}"
-          if ! nc -zvw10 "$PTERODACTYL_SFTP_HOST" "$PTERODACTYL_SFTP_PORT"; then
-            echo "::error::Cannot reach ${PTERODACTYL_SFTP_HOST}:${PTERODACTYL_SFTP_PORT} from this GitHub runner."
-            echo "::error::Allowlist the runner IP above in your firewall/provider or use a self-hosted runner."
-            exit 1
-          fi
 
       - name: Set global MTU to fix upload hang
         run: sudo ip link set dev eth0 mtu 1000

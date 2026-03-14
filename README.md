@@ -68,13 +68,19 @@ Optional for fast local testing:
 
 ## GitHub Actions workflow model
 
-This repo uses one workflow file per plugin:
-- `.github/workflows/smp.yml`
-- `.github/workflows/jumpandrun.yml`
+This repo uses one workflow file per plugin for build/release and one for release-based deploy:
+- `.github/workflows/release-smp.yml`
+- `.github/workflows/release-jumpandrun.yml`
+- `.github/workflows/deploy-smp-on-release.yml`
+- `.github/workflows/deploy-jumpandrun-on-release.yml`
 
 Each workflow triggers independently:
-- On `push` to `main` only when files inside that plugin folder change (`paths` filter)
-- On manual `workflow_dispatch`
+- Release workflows:
+	- On `push` of plugin tags (`smp-v*`, `jumpandrun-v*`)
+	- On manual `workflow_dispatch`
+- Deploy workflows:
+	- On GitHub `release.published`
+	- Filtered by release tag prefix (`smp-v*` or `jumpandrun-v*`)
 
 High-level workflow steps:
 1. Checkout code
@@ -85,9 +91,8 @@ High-level workflow steps:
 6. Run plugin-specific deploy script
 
 Each deploy script then:
-1. Builds the plugin jar via `./gradlew build`
-2. Uploads jar to server `/plugins/` via SFTP (SSH key from secrets)
-3. Calls the Pterodactyl API to notify in-game players
+1. Uploads the release jar to server `/plugins/` via SFTP (SSH key from secrets)
+2. Calls the Pterodactyl API to notify in-game players
 
 ## Adding a new plugin to the monorepo
 
@@ -97,6 +102,8 @@ Each deploy script then:
 
 ## License and usage
 
-This project is licensed under the MIT License.
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
+
+GPL allows usage, modification, and redistribution under the same GPL terms.
 
 See `LICENSE` for the full license text.

@@ -1,0 +1,70 @@
+name: Release JumpAndRun plugin
+
+on:
+  push:
+    tags:
+      - 'jumpandrun-v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (example: jumpandrun-v1.0.0)'
+        required: true
+        type: string
+
+concurrency:
+  group: release-jumpandrun-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Resolve release metadata
+        id: meta
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="${{ inputs.tag }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=JumpAndRun Plugin $TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Build JumpAndRun plugin
+        working-directory: jumpandrun-plugin
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build
+
+      - name: Resolve release artifact
+        id: artifact
+        run: |
+          JAR_PATH=$(find jumpandrun-plugin/build/libs -maxdepth 1 -type f -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -n 1)
+
+          if [[ -z "$JAR_PATH" ]]; then
+            echo "::error::No plugin jar found in jumpandrun-plugin/build/libs"
+            exit 1
+          fi
+
+          echo "jar_path=$JAR_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          generate_release_notes: true
+          files: ${{ steps.artifact.outputs.jar_path }}

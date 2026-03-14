@@ -3,8 +3,8 @@ plugins {
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
-group = 'org.pixelcampus'
-version = '1.0'
+group = findProperty('group') ?: 'org.pixelcampus'
+version = findProperty('version') ?: '1.0.0'
 
 repositories {
     mavenCentral()
