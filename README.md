@@ -8,8 +8,7 @@ Each plugin is a standalone Java project (Paper/Folia/Bukkit API, Java 21) with 
 
 ```
 pixelcampus-plugins/
-|- smp-plugin/
-|- jumpandrun-plugin/
+|- xyz-plugin/
 |- .github/workflows/
 |- LICENSE
 `- README.md
@@ -24,7 +23,7 @@ Requirements:
 Build a plugin:
 
 ```bash
-cd smp-plugin
+cd xyz-plugin
 ./gradlew clean build
 ```
 
@@ -47,8 +46,7 @@ Workflow files:
 - `.github/workflows/deploy-jumpandrun-on-release.yml`
 
 Release tag patterns:
-- SMP: `smp-v*`
-- JumpAndRun: `jumpandrun-v*`
+- `smp-v*`
 
 Pipeline (simplified):
 1. Tag push (example: `smp-v1.0.0`)
